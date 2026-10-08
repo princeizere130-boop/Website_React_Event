@@ -3,15 +3,14 @@ import "./App.css";
 
 function App() {
   const [currentSlide, setCurrentSlide] = useState(0);
-
   const [clicks, setClicks] = useState(0);
   const [name, setName] = useState("");
   const [submitted, setSubmitted] = useState("");
   const [key, setKey] = useState("No key pressed");
+
   const [mouseStatus, setMouseStatus] = useState(
     "Move your mouse into the box"
   );
-  const [focused, setFocused] = useState(false);
 
   const [bubbleMessage, setBubbleMessage] = useState(
     "Click the child button"
@@ -23,51 +22,52 @@ function App() {
   const totalSlides = 15;
 
   // -----------------------------
-  // NEXT SLIDE
+  // SLIDE NAVIGATION
   // -----------------------------
+
   const nextSlide = () => {
-    setCurrentSlide((previous) =>
-      previous < totalSlides - 1 ? previous + 1 : previous
+    setCurrentSlide((prev) =>
+      prev < totalSlides - 1 ? prev + 1 : prev
     );
   };
 
-  // -----------------------------
-  // PREVIOUS SLIDE
-  // -----------------------------
   const previousSlide = () => {
-    setCurrentSlide((previous) =>
-      previous > 0 ? previous - 1 : previous
-    );
+    setCurrentSlide((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
   // -----------------------------
   // KEYBOARD NAVIGATION
   // -----------------------------
+
   useEffect(() => {
-    const handleKeyboard = (event) => {
+    const handleKeyboardNavigation = (event) => {
       if (event.key === "ArrowRight") {
-        setCurrentSlide((previous) =>
-          previous < totalSlides - 1 ? previous + 1 : previous
+        setCurrentSlide((prev) =>
+          prev < totalSlides - 1 ? prev + 1 : prev
         );
       }
 
       if (event.key === "ArrowLeft") {
-        setCurrentSlide((previous) =>
-          previous > 0 ? previous - 1 : previous
+        setCurrentSlide((prev) =>
+          prev > 0 ? prev - 1 : prev
         );
       }
     };
 
-    window.addEventListener("keydown", handleKeyboard);
+    window.addEventListener("keydown", handleKeyboardNavigation);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyboard);
+      window.removeEventListener(
+        "keydown",
+        handleKeyboardNavigation
+      );
     };
   }, []);
 
   // -----------------------------
   // DEBOUNCING
   // -----------------------------
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedValue(search);
@@ -77,801 +77,634 @@ function App() {
   }, [search]);
 
   // -----------------------------
-  // SLIDE CONTENT
+  // FORM
   // -----------------------------
-  const slides = [
 
-    // 1
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setSubmitted(name);
+  };
+
+  // -----------------------------
+  // KEYBOARD EVENT
+  // -----------------------------
+
+  const handleKeyDown = (event) => {
+    setKey(`Key Down: ${event.key}`);
+  };
+
+  const handleKeyUp = (event) => {
+    setKey(`Key Up: ${event.key}`);
+  };
+
+  // -----------------------------
+  // EVENT BUBBLING
+  // -----------------------------
+
+  const handleParentClick = () => {
+    setBubbleMessage("Parent clicked!");
+  };
+
+  const handleChildClick = (event) => {
+    event.stopPropagation();
+    setBubbleMessage("Child clicked — propagation stopped!");
+  };
+
+  // -----------------------------
+  // SLIDES
+  // -----------------------------
+
+  const slides = [
     {
-      number: "01",
-      title: "Events in React",
       type: "title",
+      title: "Events in React",
+      subtitle: "Interactive React Presentation",
       content: (
-        <>
-          <p className="big-description">
-            Frontend Application with React.js
+        <div className="title-content">
+          <h1>Events in React</h1>
+
+          <p>
+            Learn how React responds to user interactions
+            and creates interactive applications.
+          </p>
+
+          <div className="student-info">
+            <span>Kigarama TSS</span>
+            <span>L5 Software Development</span>
+            <span>Teacher: Steven</span>
+          </div>
+        </div>
+      ),
+    },
+
+    {
+      title: "What is an Event?",
+      content: (
+        <div>
+          <p>
+            An event is an action that happens in a web
+            application because of the user or the browser.
+          </p>
+
+          <div className="cards">
+            <div className="card">
+              <h3>🖱️ Mouse</h3>
+              <p>Click, hover, move, enter and leave.</p>
+            </div>
+
+            <div className="card">
+              <h3>⌨️ Keyboard</h3>
+              <p>Pressing and releasing keyboard keys.</p>
+            </div>
+
+            <div className="card">
+              <h3>📝 Form</h3>
+              <p>Typing, submitting, focusing and blurring.</p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+
+    {
+      title: "Types of Events",
+      content: (
+        <div className="cards">
+          <div className="card">
+            <h3>Mouse Events</h3>
+            <p>onClick, onMouseEnter, onMouseLeave</p>
+          </div>
+
+          <div className="card">
+            <h3>Keyboard Events</h3>
+            <p>onKeyDown, onKeyUp</p>
+          </div>
+
+          <div className="card">
+            <h3>Form Events</h3>
+            <p>onChange, onSubmit, onFocus, onBlur</p>
+          </div>
+
+          <div className="card">
+            <h3>React Events</h3>
+            <p>
+              React provides a consistent event system
+              across browsers.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+
+    {
+      title: "onClick Event",
+      content: (
+        <div className="demo">
+          <h2>Click the button</h2>
+
+          <button
+            onClick={() => setClicks(clicks + 1)}
+            className="primary-button"
+          >
+            Click Me
+          </button>
+
+          <div className="counter">
+            Clicks: <strong>{clicks}</strong>
+          </div>
+
+          <button
+            onClick={() => setClicks(0)}
+            className="secondary-button"
+          >
+            Reset
+          </button>
+
+          <p>
+            The <code>onClick</code> event runs when the
+            user clicks an element.
+          </p>
+        </div>
+      ),
+    },
+
+    {
+      title: "Form Events",
+      content: (
+        <div className="demo">
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(event) =>
+                setName(event.target.value)
+              }
+            />
+
+            <button
+              type="submit"
+              className="primary-button"
+            >
+              Submit
+            </button>
+          </form>
+
+          <p>
+            <strong>Typed value:</strong>{" "}
+            {name || "Nothing yet"}
           </p>
 
           <p>
-            An interactive presentation explaining how React
-            handles user events and interactions.
+            <strong>Submitted:</strong>{" "}
+            {submitted || "Nothing submitted"}
           </p>
-
-          <div className="presentation-info">
-            <span>Kigarama TSS</span>
-            <span>L5 Software Development</span>
-            <span>Teacher Steven</span>
-          </div>
-        </>
-      ),
-    },
-
-    // 2
-    {
-      number: "02",
-      title: "What is an Event in React?",
-      content: (
-        <>
-          <div className="definition">
-            <strong>Definition</strong>
-
-            <p>
-              An event is an action or occurrence that happens
-              because of the user or the system.
-            </p>
-          </div>
-
-          <div className="examples">
-            <div>🖱️ Click</div>
-            <div>⌨️ Keyboard</div>
-            <div>📝 Form</div>
-            <div>🖱️ Mouse</div>
-            <div>🎯 Focus</div>
-          </div>
-
-          <div className="explanation">
-            <h3>Simple idea</h3>
-
-            <p>
-              When a user does something, React can detect that
-              action and execute a function.
-            </p>
-
-            <p className="formula">
-              User Action → Event → Handler → UI Update
-            </p>
-          </div>
-        </>
-      ),
-    },
-
-    // 3
-    {
-      number: "03",
-      title: "Types of React Events",
-      content: (
-        <>
-          <div className="event-types">
-
-            <div>
-              <span>🖱️</span>
-              <h3>Mouse Events</h3>
-              <p>
-                onClick, onDoubleClick,
-                onMouseEnter, onMouseLeave
-              </p>
-            </div>
-
-            <div>
-              <span>⌨️</span>
-              <h3>Keyboard Events</h3>
-              <p>
-                onKeyDown, onKeyUp
-              </p>
-            </div>
-
-            <div>
-              <span>📝</span>
-              <h3>Form Events</h3>
-              <p>
-                onChange, onSubmit,
-                onFocus, onBlur
-              </p>
-            </div>
-
-            <div>
-              <span>⚛️</span>
-              <h3>React Events</h3>
-              <p>
-                Synthetic events and
-                event propagation
-              </p>
-            </div>
-
-          </div>
-        </>
-      ),
-    },
-
-    // 4
-    {
-      number: "04",
-      title: "onClick Event",
-      content: (
-        <>
-          <div className="definition">
-            <strong>What is onClick?</strong>
-
-            <p>
-              onClick runs a function when the user clicks
-              an element such as a button.
-            </p>
-          </div>
-
-          <div className="code-box">
-            <code>
-              {`function App() {
-  const handleClick = () => {
-    alert("Button clicked!");
-  };
-
-  return (
-    <button onClick={handleClick}>
-      Click Me
-    </button>
-  );
-}`}
-            </code>
-          </div>
-
-          <div className="demo-area">
-            <button
-              className="main-button"
-              onClick={() => setClicks(clicks + 1)}
-            >
-              Click Me
-            </button>
-
-            <p>
-              Button clicked: <strong>{clicks}</strong> times
-            </p>
-          </div>
-        </>
-      ),
-    },
-
-    // 5
-    {
-      number: "05",
-      title: "Form Events",
-      content: (
-        <>
-          <div className="definition">
-            <strong>Important Form Events</strong>
-
-            <p>
-              React provides events for handling user input
-              and forms.
-            </p>
-          </div>
 
           <div className="event-list">
-            <div>
-              <strong>onChange</strong>
-              <span>Detects changes in an input.</span>
-            </div>
-
-            <div>
-              <strong>onSubmit</strong>
-              <span>Handles form submission.</span>
-            </div>
-
-            <div>
-              <strong>onFocus</strong>
-              <span>Runs when an input gets focus.</span>
-            </div>
-
-            <div>
-              <strong>onBlur</strong>
-              <span>Runs when an input loses focus.</span>
-            </div>
+            <p>• onChange → detects input changes</p>
+            <p>• onSubmit → handles form submission</p>
+            <p>• onFocus → input becomes active</p>
+            <p>• onBlur → input loses focus</p>
           </div>
-
-          <input
-            className="presentation-input"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Type your name..."
-          />
-
-          <p className="live-result">
-            Current value: {name || "Waiting..."}
-          </p>
-
-          <button
-            className="main-button"
-            onClick={() => setSubmitted(name)}
-          >
-            Submit
-          </button>
-
-          {submitted && (
-            <p className="success">
-              Submitted successfully: {submitted}
-            </p>
-          )}
-        </>
+        </div>
       ),
     },
 
-    // 6
     {
-      number: "06",
       title: "Mouse Events",
       content: (
-        <>
-          <div className="definition">
-            <strong>Mouse Events</strong>
-
-            <p>
-              Mouse events allow React applications to respond
-              to different mouse actions.
-            </p>
-          </div>
-
-          <div className="event-types small">
-
-            <div>
-              <h3>onClick</h3>
-              <p>When the element is clicked.</p>
-            </div>
-
-            <div>
-              <h3>onDoubleClick</h3>
-              <p>When the element is clicked twice.</p>
-            </div>
-
-            <div>
-              <h3>onMouseEnter</h3>
-              <p>When the mouse enters.</p>
-            </div>
-
-            <div>
-              <h3>onMouseLeave</h3>
-              <p>When the mouse leaves.</p>
-            </div>
-
-          </div>
-
+        <div className="demo">
           <div
-            className="mouse-demo"
+            className="mouse-box"
             onMouseEnter={() =>
-              setMouseStatus("Mouse entered the box")
+              setMouseStatus("Mouse entered the box!")
             }
             onMouseLeave={() =>
-              setMouseStatus("Mouse left the box")
+              setMouseStatus("Mouse left the box!")
             }
           >
-            <span>MOVE YOUR MOUSE HERE</span>
-            <small>{mouseStatus}</small>
+            Move your mouse here
           </div>
-        </>
+
+          <h3>{mouseStatus}</h3>
+
+          <p>
+            Common mouse events include:
+          </p>
+
+          <ul>
+            <li>onClick</li>
+            <li>onDoubleClick</li>
+            <li>onMouseEnter</li>
+            <li>onMouseLeave</li>
+            <li>onMouseMove</li>
+          </ul>
+        </div>
       ),
     },
 
-    // 7
     {
-      number: "07",
       title: "Keyboard Events",
       content: (
-        <>
-          <div className="definition">
-            <strong>Keyboard Events</strong>
-
-            <p>
-              Keyboard events happen when a user presses or
-              releases a key.
-            </p>
-          </div>
-
-          <div className="event-types small">
-
-            <div>
-              <h3>onKeyDown</h3>
-              <p>Runs when a key is pressed down.</p>
-            </div>
-
-            <div>
-              <h3>onKeyUp</h3>
-              <p>Runs when a key is released.</p>
-            </div>
-
-          </div>
-
+        <div className="demo">
           <input
-            className="presentation-input"
-            onKeyDown={(event) =>
-              setKey(`Key Down: ${event.key}`)
-            }
-            onKeyUp={(event) =>
-              setKey(`Key Up: ${event.key}`)
-            }
-            placeholder="Press any keyboard key..."
+            type="text"
+            placeholder="Press any key"
+            onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
           />
 
-          <div className="key-result">
+          <div className="key-display">
             {key}
           </div>
-        </>
+
+          <p>
+            <code>onKeyDown</code> happens when a key is
+            pressed.
+          </p>
+
+          <p>
+            <code>onKeyUp</code> happens when a key is
+            released.
+          </p>
+        </div>
       ),
     },
 
-    // 8
     {
-      number: "08",
-      title: "Synthetic Event",
+      title: "SyntheticEvent",
       content: (
-        <>
-          <div className="definition">
-            <strong>What is a Synthetic Event?</strong>
+        <div>
+          <p>
+            React uses a system called{" "}
+            <strong>SyntheticEvent</strong>.
+          </p>
 
-            <p>
-              A SyntheticEvent is React's wrapper around the
-              browser's native event.
-            </p>
+          <div className="card">
+            <h3>Why SyntheticEvent?</h3>
+
+            <ul>
+              <li>Provides a consistent event interface.</li>
+              <li>Works across different browsers.</li>
+              <li>Uses normal event properties.</li>
+              <li>Makes event handling easier in React.</li>
+            </ul>
           </div>
 
-          <div className="explanation">
-
-            <h3>Why does React use it?</h3>
-
-            <p>
-              It gives developers a consistent way to work
-              with events across different browsers.
-            </p>
-
-          </div>
-
-          <div className="code-box">
-            <code>
-              {`function handleClick(event) {
+          <pre>
+{`function handleClick(event) {
   console.log(event.type);
   console.log(event.target);
-}
-
-<button onClick={handleClick}>
-  Test Event
-</button>`}
-            </code>
-          </div>
-
-          <button
-            className="main-button"
-            onClick={(event) =>
-              alert(
-                `Event Type: ${event.type}\nTarget: ${event.target.tagName}`
-              )
-            }
-          >
-            Test Synthetic Event
-          </button>
-        </>
+}`}
+          </pre>
+        </div>
       ),
     },
 
-    // 9
     {
-      number: "09",
       title: "Event Bubbling",
       content: (
-        <>
-          <div className="definition">
-            <strong>What is Event Bubbling?</strong>
+        <div className="demo">
+          <div
+            className="parent-box"
+            onClick={handleParentClick}
+          >
+            <h3>Parent</h3>
 
-            <p>
-              Event bubbling means an event starts at the
-              target element and then moves upward through
-              its parent elements.
-            </p>
+            <button
+              className="primary-button"
+              onClick={handleChildClick}
+            >
+              Child Button
+            </button>
           </div>
 
-          <div className="bubble-diagram">
-            <div className="parent-box">
-              Parent
+          <h3>{bubbleMessage}</h3>
 
-              <div className="child-box">
-                Child
-
-                <button
-                  onClick={() =>
-                    setBubbleMessage(
-                      "Child clicked → event can bubble to Parent"
-                    )
-                  }
-                >
-                  Click Child
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="explanation">
-
-            <h3>Stopping bubbling</h3>
-
-            <p>
-              We can stop an event from moving to the parent
-              using:
-            </p>
-
-            <div className="inline-code">
-              event.stopPropagation()
-            </div>
-
-          </div>
-
-          <p className="live-result">
-            {bubbleMessage}
+          <p>
+            Events normally move from the target element
+            upward through its parents.
           </p>
-        </>
+
+          <p>
+            <code>stopPropagation()</code> can stop this
+            behavior.
+          </p>
+        </div>
       ),
     },
 
-    // 10
     {
-      number: "10",
       title: "Debouncing",
       content: (
-        <>
-          <div className="definition">
-            <strong>What is Debouncing?</strong>
-
-            <p>
-              Debouncing waits until the user stops performing
-              an action before running a function.
-            </p>
-          </div>
-
-          <div className="formula">
-            User types → wait → user stops → function runs
-          </div>
-
-          <div className="code-box">
-            <code>
-              {`useEffect(() => {
-  const timer = setTimeout(() => {
-    searchAPI(value);
-  }, 600);
-
-  return () => clearTimeout(timer);
-}, [value]);`}
-            </code>
-          </div>
-
+        <div className="demo">
           <input
-            className="presentation-input"
+            type="text"
+            placeholder="Search..."
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Type quickly..."
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
           />
 
-          <div className="debounce-result">
-            <span>Debounced value:</span>
-            <strong>
+          <div className="search-results">
+            <p>
+              <strong>Current:</strong>{" "}
+              {search || "Empty"}
+            </p>
+
+            <p>
+              <strong>Debounced:</strong>{" "}
               {debouncedValue || "Waiting..."}
-            </strong>
+            </p>
           </div>
 
-          <p className="tip">
-            Easy memory: <strong>STOP → RUN</strong>
+          <p>
+            Debouncing waits until the user stops typing
+            before running an action.
           </p>
-        </>
+
+          <p>
+            In this example the delay is{" "}
+            <strong>600 milliseconds</strong>.
+          </p>
+        </div>
       ),
     },
 
-    // 11
     {
-      number: "11",
       title: "Throttling",
       content: (
-        <>
-          <div className="definition">
-            <strong>What is Throttling?</strong>
-
-            <p>
-              Throttling limits how often a function can run
-              during a period of time.
-            </p>
-          </div>
-
-          <div className="formula">
-            Event → RUN → WAIT → RUN → WAIT
-          </div>
-
-          <div className="code-box">
-            <code>
-              {`if (Date.now() - lastTime >= 500) {
-  handleEvent();
-  lastTime = Date.now();
-}`}
-            </code>
-          </div>
-
-          <div className="throttle-demo">
-            <span>THROTTLING</span>
-            <p>
-              Useful for scroll, resize and mouse movement.
-            </p>
-          </div>
-
-          <p className="tip">
-            Easy memory: <strong>RUN → WAIT → RUN</strong>
+        <div>
+          <p>
+            Throttling controls how frequently a function
+            can run.
           </p>
-        </>
+
+          <div className="cards">
+            <div className="card">
+              <h3>Debouncing</h3>
+              <p>
+                Waits until the activity stops.
+              </p>
+            </div>
+
+            <div className="card">
+              <h3>Throttling</h3>
+              <p>
+                Runs at a controlled interval.
+              </p>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3>Example Uses</h3>
+
+            <ul>
+              <li>Scroll events</li>
+              <li>Window resize</li>
+              <li>Mouse movement</li>
+              <li>Search optimization</li>
+            </ul>
+          </div>
+        </div>
       ),
     },
 
-    // 12
     {
-      number: "12",
-      title: "React Event Flow",
+      title: "Event Flow",
       content: (
-        <>
-          <div className="event-flow-large">
-
-            <div>
-              <span>01</span>
-              <strong>User Action</strong>
-              <p>Click, type or move.</p>
+        <div>
+          <div className="flow">
+            <div className="flow-item">
+              1. User Action
             </div>
 
             <div className="arrow">→</div>
 
-            <div>
-              <span>02</span>
-              <strong>React Event</strong>
-              <p>React detects it.</p>
+            <div className="flow-item">
+              2. Browser Event
             </div>
 
             <div className="arrow">→</div>
 
-            <div>
-              <span>03</span>
-              <strong>Handler</strong>
-              <p>Function executes.</p>
+            <div className="flow-item">
+              3. React Handler
             </div>
 
             <div className="arrow">→</div>
 
-            <div>
-              <span>04</span>
-              <strong>State/UI</strong>
-              <p>Interface updates.</p>
+            <div className="flow-item">
+              4. State Update
             </div>
 
+            <div className="arrow">→</div>
+
+            <div className="flow-item">
+              5. UI Update
+            </div>
           </div>
 
-          <div className="final-message">
-            React makes user interaction easier by connecting
-            events with components and state.
+          <div className="card">
+            <h3>Simple Example</h3>
+
+            <pre>
+{`User clicks button
+        ↓
+onClick runs
+        ↓
+setState()
+        ↓
+React re-renders
+        ↓
+UI changes`}
+            </pre>
           </div>
-        </>
+        </div>
       ),
     },
 
-    // 13
     {
-      number: "13",
-      title: "Project Team",
+      title: "Team",
       content: (
-        <>
-          <p className="center-text">
-            This React project was developed by:
-          </p>
+        <div className="team">
+          <div className="card">
+            <h3>Izere Prince</h3>
+            <p>Software Developer</p>
+          </div>
 
-          <div className="team">
+          <div className="card">
+            <h3>Rutayisire Jackson</h3>
+            <p>Software Developer</p>
+          </div>
 
-            <div className="member">
-              <div>IP</div>
-              <h3>Izere Prince</h3>
-              <p>Software Development Student</p>
-            </div>
-
-            <div className="member">
-              <div>RJ</div>
-              <h3>Rutayisire Jackson</h3>
-              <p>Software Development Student</p>
-            </div>
-
-            <div className="member">
-              <div>MN</div>
-              <h3>Muganga Nelson</h3>
-              <p>Software Development Student</p>
-            </div>
-
+          <div className="card">
+            <h3>Muganga Nelson</h3>
+            <p>Software Developer</p>
           </div>
 
           <div className="teacher">
-            <span>TEACHER</span>
-            <h3>Steven</h3>
-            <p>Kigarama TSS — L5 Software Development</p>
+            <h3>Teacher</h3>
+            <p>Steven</p>
           </div>
-        </>
+        </div>
       ),
     },
 
-    // 14
     {
-      number: "14",
       title: "Advertisement",
       content: (
-        <>
-          <div className="iptech">
+        <div className="advertisement">
+          <h1>IPTECH</h1>
 
-            <span>ADVERTISEMENT</span>
+          <h2>Technology • Innovation • Development</h2>
 
-            <h2>IPTECH</h2>
+          <p>
+            Building modern digital solutions through
+            software development and technology.
+          </p>
 
-            <h3>
-              Technology, Software & AI Solutions
-            </h3>
-
-            <p>
-              Discover technology, software development and
-              AI solutions.
-            </p>
-
-            <a
-              href="https://iptech-1.vercel.app/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Visit IPTECH →
-            </a>
-
-          </div>
-        </>
+          <a
+            href="https://iptech-1.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            className="primary-button"
+          >
+            Visit IPTECH →
+          </a>
+        </div>
       ),
     },
 
-    // 15
     {
-      number: "15",
       title: "Thank You",
-      type: "title",
       content: (
-        <>
-          <div className="thank-you">
-            <h2>Thank You!</h2>
+        <div className="thank-you">
+          <h1>Thank You!</h1>
 
-            <p>
-              We hope this presentation helped you understand
-              Events in React.
-            </p>
+          <p>
+            Thank you for listening to our presentation.
+          </p>
 
-            <div className="presentation-info">
-              <span>Izere Prince</span>
-              <span>Rutayisire Jackson</span>
-              <span>Muganga Nelson</span>
-            </div>
+          <p>
+            We hope you now understand how events work
+            in React.
+          </p>
 
-            <p className="school">
-              Kigarama TSS • L5 Software Development
-              <br />
-              Teacher Steven
-            </p>
+          <div className="card">
+            <h3>Key Takeaways</h3>
+
+            <ul>
+              <li>React events make applications interactive.</li>
+              <li>Event handlers respond to user actions.</li>
+              <li>State can be updated through events.</li>
+              <li>Events can bubble through components.</li>
+              <li>Debouncing and throttling improve performance.</li>
+            </ul>
           </div>
-        </>
+        </div>
       ),
     },
   ];
 
+  // -----------------------------
+  // CURRENT SLIDE
+  // -----------------------------
+
   const slide = slides[currentSlide];
 
   return (
-    <div className="presentation">
-
+    <div className="app">
       {/* TOP BAR */}
-      <header className="topbar">
 
-        <div className="logo">
-          <span>R</span>
-          <div>
-            <strong>React Events</strong>
-            <small>Frontend Application with React.js</small>
-          </div>
+      <header className="top-bar">
+        <div className="brand">
+          <span className="brand-logo">R</span>
+          <span>React Events</span>
         </div>
 
-        <div className="counter">
-          {String(currentSlide + 1).padStart(2, "0")}
-          {" / "}
-          {String(totalSlides).padStart(2, "0")}
+        <div className="slide-counter">
+          {currentSlide + 1} / {totalSlides}
         </div>
-
       </header>
 
-      {/* SLIDE */}
-      <main className={`slide ${slide.type === "title" ? "title-slide" : ""}`}>
+      {/* PROGRESS BAR */}
 
-        <div className="slide-number">
-          {slide.number}
-        </div>
+      <div className="progress-container">
+        <div
+          className="progress-bar"
+          style={{
+            width: `${
+              ((currentSlide + 1) / totalSlides) * 100
+            }%`,
+          }}
+        />
+      </div>
 
-        <div className="slide-content">
+      {/* MAIN PRESENTATION */}
 
-          <span className="topic-label">
-            EVENTS IN REACT
-          </span>
+      <main className="presentation">
+        <section
+          className={`slide ${
+            slide.type === "title" ? "title-slide" : ""
+          }`}
+        >
+          <div className="slide-content">
+            {!slide.type && (
+              <h1 className="slide-title">
+                {slide.title}
+              </h1>
+            )}
 
-          <h1>{slide.title}</h1>
-
-          <div className="content">
             {slide.content}
           </div>
-
-        </div>
-
+        </section>
       </main>
 
       {/* NAVIGATION */}
-      <div className="navigation">
 
+      <div className="navigation">
         <button
           onClick={previousSlide}
           disabled={currentSlide === 0}
-          title="Previous slide"
+          className="nav-button"
         >
-          ←
+          ← Previous
         </button>
 
-        <div className="progress">
-
-          <div
-            className="progress-bar"
-            style={{
-              width: `${((currentSlide + 1) / totalSlides) * 100}%`,
-            }}
-          />
-
+        <div className="dots">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${
+                index === currentSlide ? "active" : ""
+              }`}
+              onClick={() => setCurrentSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
 
         <button
           onClick={nextSlide}
           disabled={currentSlide === totalSlides - 1}
-          title="Next slide"
+          className="nav-button"
         >
-          →
+          Next →
         </button>
-
-      </div>
-
-      {/* KEYBOARD HINT */}
-      <div className="keyboard-hint">
-        Use <kbd>←</kbd> <kbd>→</kbd> Arrow Keys to navigate
       </div>
 
       {/* FOOTER */}
-      <footer>
 
-        <span>Kigarama TSS</span>
-
-        <span>•</span>
-
-        <span>L5 Software Development</span>
-
-        <span>•</span>
-
-        <span>Teacher Steven</span>
-
-        <span>•</span>
+      <footer className="footer">
+        <span>React Events Presentation</span>
 
         <span>
-          Developed by Izere Prince, Rutayisire Jackson &
-          Muganga Nelson
+          Use ← → arrow keys to navigate
         </span>
 
+        <span>IPTECH</span>
       </footer>
-
     </div>
   );
 }
